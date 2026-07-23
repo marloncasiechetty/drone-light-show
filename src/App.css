@@ -67,7 +67,7 @@ body {
 
 .eyebrow {
   font-family: var(--display);
-  font-weight: 200;
+  font-weight: 400;
   font-size: 0.72rem;
   letter-spacing: 0.34em;
   text-transform: uppercase;
@@ -87,7 +87,7 @@ body {
   pointer-events: auto;
   padding: 15px 34px;
   font-family: var(--display);
-  font-weight: 400;
+  font-weight: 700;
   font-size: 0.78rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -216,7 +216,7 @@ main {
 
 .panel-label {
   font-family: var(--display);
-  font-weight: 200;
+  font-weight: 400;
   font-size: 0.72rem;
   letter-spacing: 0.34em;
   text-transform: uppercase;
@@ -226,7 +226,7 @@ main {
 
 .statement {
   font-family: var(--display);
-  font-weight: 200;
+  font-weight: 400;
   font-size: clamp(1.7rem, 4vw, 3.2rem);
   line-height: 1.25;
   letter-spacing: 0;
@@ -375,7 +375,7 @@ main {
 
 .show-row h3 {
   font-family: var(--display);
-  font-weight: 300;
+  font-weight: 400;
   font-size: clamp(1.3rem, 3vw, 2.3rem);
   color: #fff;
   margin: 0;
@@ -492,7 +492,7 @@ main {
 
 .clients span {
   font-family: var(--display);
-  font-weight: 200;
+  font-weight: 400;
   font-size: 0.85rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
