@@ -311,7 +311,15 @@ function App() {
 
         <section id="book" className="panel closing">
           <h2 className="statement reveal">Ready to light your sky?</h2>
-          <button className="cta reveal" onClick={handleBookClick}>Book a show</button>
+          <button className="hero-pill-btn reveal" onClick={handleBookClick}>
+            <span>Book a show</span>
+            <span className="pill-arrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </span>
+          </button>
         </section>
 
         <footer className="site-footer">
