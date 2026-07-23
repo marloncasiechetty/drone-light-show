@@ -129,8 +129,8 @@ button,
 .hero-title-giant {
   font-family: var(--display);
   font-weight: 700;
-  font-size: clamp(2.8rem, 9.5vw, 140px);
-  line-height: 0.86;
+  font-size: clamp(2.4rem, 7.5vw, 98px);
+  line-height: 0.88;
   letter-spacing: -0.03em;
   color: #ece8d9;
   margin: 0;
