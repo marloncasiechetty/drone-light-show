@@ -122,12 +122,32 @@ function PointerTracker() {
 }
 
 function CameraRig() {
-  useFrame((state) => {
-    const targetX = state.pointer.x * 1.6
-    const targetY = 3 - state.pointer.y * 1
-    state.camera.position.x += (targetX - state.camera.position.x) * 0.03
-    state.camera.position.y += (targetY - state.camera.position.y) * 0.03
-    state.camera.lookAt(0, 3.2, 0)
+  useFrame((state, delta) => {
+    // state.pointer.x is [-1, 1] (left to right)
+    // state.pointer.y is [-1, 1] (bottom to top)
+    const px = state.pointer.x
+    const py = state.pointer.y
+
+    // Target positions for 3D spatial depth:
+    // Moving mouse down (py -> -1) zooms IN to the drone fleet (z -> 6.5)
+    // Moving mouse up (py -> 1) zooms OUT (z -> 18.5)
+    const targetX = px * 4.2
+    const targetY = 3.2 - py * 1.5
+    const targetZ = 12.5 + py * 6.0
+
+    // Smooth damp camera position for fluid spatial motion
+    const ease = Math.min(delta * 4, 0.1)
+    state.camera.position.x += (targetX - state.camera.position.x) * ease
+    state.camera.position.y += (targetY - state.camera.position.y) * ease
+    state.camera.position.z += (targetZ - state.camera.position.z) * ease
+
+    // Dynamic focal point tracking
+    const lookTargetX = px * 0.8
+    const lookTargetY = 3.2 + py * 0.4
+    state.camera.lookAt(lookTargetX, lookTargetY, 0)
+
+    // Subtle 3D spatial roll (tilt) for cinematic depth
+    state.camera.rotation.z = -px * 0.04
   })
   return null
 }
