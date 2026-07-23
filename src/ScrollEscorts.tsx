@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useMemo, useRef } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Drone } from './Drone'
@@ -14,8 +14,25 @@ function Escort({ seed, side, depth, scale, color }: { seed: number; side: 1 | -
   const vel = useRef(0)
   const lastY = useRef(0)
 
+  const [hovered, setHovered] = useState(false)
+  const wiggleFactor = useRef(0)
+  const groupRef = useRef<THREE.Group>(null!)
+
+  useEffect(() => {
+    if (hovered) {
+      document.body.style.cursor = 'pointer'
+    } else {
+      document.body.style.cursor = ''
+    }
+    return () => {
+      document.body.style.cursor = ''
+    }
+  }, [hovered])
+
   useFrame((state, rawDelta) => {
     const delta = Math.min(rawDelta, 0.1)
+    const t = state.clock.elapsedTime
+
     // smoothed scroll velocity — the drones dip and lag when you scroll fast, then catch up
     const dy = scroll.y - lastY.current
     lastY.current = scroll.y
@@ -31,9 +48,47 @@ function Escort({ seed, side, depth, scale, color }: { seed: number; side: 1 | -
 
     pos.x = THREE.MathUtils.damp(pos.x, tx, 1.6, delta)
     pos.y = THREE.MathUtils.damp(pos.y, ty, 1.6, delta)
+
+    // Wiggle animation calculation when hovered
+    const targetWiggle = hovered ? 1 : 0
+    wiggleFactor.current = THREE.MathUtils.damp(wiggleFactor.current, targetWiggle, 8, delta)
+    const w = wiggleFactor.current
+
+    if (groupRef.current) {
+      // Energetic 3D rotation wiggle tilt
+      const rx = Math.sin(t * 30 + seed) * 0.35 * w
+      const ry = Math.cos(t * 26 + seed) * 0.4 * w
+      const rz = Math.sin(t * 32 + seed) * 0.45 * w
+
+      groupRef.current.rotation.set(rx, ry, rz)
+
+      const currentScale = scale * (1 + Math.sin(t * 18 + seed) * 0.15 * w)
+      groupRef.current.scale.set(currentScale, currentScale, currentScale)
+    }
   })
 
-  return <Drone formationPosition={pos} showColor={color} glow={1.6} scale={scale} wander={[0.45, 0.3]} speed={0.35} phase={seed} lit />
+  return (
+    <group
+      ref={groupRef}
+      onPointerOver={(e) => {
+        e.stopPropagation()
+        setHovered(true)
+      }}
+      onPointerOut={() => setHovered(false)}
+    >
+      <Drone
+        formationPosition={pos}
+        showColor={color}
+        glow={hovered ? 4.5 : 1.6}
+        scale={scale}
+        wander={hovered ? [0.8, 0.6] : [0.45, 0.3]}
+        speed={hovered ? 1.2 : 0.35}
+        spinSpeed={hovered ? 28 : 10}
+        phase={seed}
+        lit
+      />
+    </group>
+  )
 }
 
 export function ScrollEscorts() {

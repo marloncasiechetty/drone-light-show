@@ -310,6 +310,10 @@ button,
   pointer-events: none;
 }
 
+.escorts canvas {
+  pointer-events: auto;
+}
+
 /* ---- sections ---- */
 
 main {
