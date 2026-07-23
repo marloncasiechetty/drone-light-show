@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Drone } from './Drone'
@@ -14,14 +14,8 @@ function Escort({ seed, side, depth, scale, color }: { seed: number; side: 1 | -
   const vel = useRef(0)
   const lastY = useRef(0)
 
-  const [hovered, setHovered] = useState(false)
-  const wiggleFactor = useRef(0)
-  const groupRef = useRef<THREE.Group>(null!)
-
   useFrame((state, rawDelta) => {
     const delta = Math.min(rawDelta, 0.1)
-    const t = state.clock.elapsedTime
-
     // smoothed scroll velocity — the drones dip and lag when you scroll fast, then catch up
     const dy = scroll.y - lastY.current
     lastY.current = scroll.y
@@ -35,45 +29,11 @@ function Escort({ seed, side, depth, scale, color }: { seed: number; side: 1 | -
     // parked above the viewport during the hero; drift up and down as sections pass
     const ty = p > 0.03 ? THREE.MathUtils.clamp(Math.cos(p * Math.PI * 1.7 + seed) * 1.6 - vel.current * 0.0012, -2.6, 2.6) : 10
 
-    // Calculate cursor proximity in 3D world space (bulletproof hover trigger)
-    const mouseWorldX = (state.pointer.x * state.viewport.width) / 2
-    const mouseWorldY = (state.pointer.y * state.viewport.height) / 2
-    const distToCursor = Math.hypot(mouseWorldX - pos.x, mouseWorldY - pos.y)
-    
-    const isProximityHover = distToCursor < 2.5 || hovered
-    const targetWiggle = isProximityHover ? 1 : 0
-    wiggleFactor.current = THREE.MathUtils.damp(wiggleFactor.current, targetWiggle, 3.5, delta)
-    const w = wiggleFactor.current
-
-    // Gentle vertical up and down movement when hovered
-    const hoverBobY = Math.sin(t * 3.5 + seed) * 0.22 * w
-
     pos.x = THREE.MathUtils.damp(pos.x, tx, 1.6, delta)
-    pos.y = THREE.MathUtils.damp(pos.y, ty + hoverBobY, 1.6, delta)
+    pos.y = THREE.MathUtils.damp(pos.y, ty, 1.6, delta)
   })
 
-  return (
-    <group
-      ref={groupRef}
-      onPointerOver={(e) => {
-        e.stopPropagation()
-        setHovered(true)
-      }}
-      onPointerOut={() => setHovered(false)}
-    >
-      <Drone
-        formationPosition={pos}
-        showColor={color}
-        glow={2.0}
-        scale={scale}
-        wander={[0.5, 0.35]}
-        speed={0.4}
-        spinSpeed={12}
-        phase={seed}
-        lit
-      />
-    </group>
-  )
+  return <Drone formationPosition={pos} showColor={color} glow={1.6} scale={scale} wander={[0.45, 0.3]} speed={0.35} phase={seed} lit />
 }
 
 export function ScrollEscorts() {
