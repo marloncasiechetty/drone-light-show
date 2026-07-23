@@ -4,8 +4,12 @@
   --cyan: #a5f3fc;
   --mist: #cfd3e6;
   --hairline: rgba(157, 180, 255, 0.14);
-  --display: 'Unbounded', system-ui, sans-serif;
+  --display: 'Almarai', system-ui, sans-serif;
   --body: 'Space Grotesk', system-ui, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--display);
 }
 
 body {
