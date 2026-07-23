@@ -67,12 +67,12 @@ body {
 
 .nav-link {
   font-family: var(--body);
-  font-size: 0.92rem;
+  font-size: 0.84rem;
   color: var(--mist);
   text-decoration: none;
-  font-weight: 500;
-  text-transform: capitalize;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
   transition: all 0.25s ease;
   padding: 4px 8px;
 }
