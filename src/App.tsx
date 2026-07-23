@@ -225,7 +225,7 @@ function App() {
             <nav className="hero-nav">
               <a href="#about" className="nav-link">About</a>
               <a href="#portfolio" className="nav-link">Portfolio</a>
-              <a href="#timeline" className="nav-link">Process</a>
+              <a href="#process" className="nav-link">Process</a>
               <a href="#testimonials" className="nav-link">Testimonials</a>
             </nav>
           </header>
