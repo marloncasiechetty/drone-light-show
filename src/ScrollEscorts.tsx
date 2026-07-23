@@ -47,19 +47,19 @@ function Escort({ seed, side, depth, scale, color }: { seed: number; side: 1 | -
     const isProximityHover = distToCursor < 2.5 || hovered
 
     const targetWiggle = isProximityHover ? 1 : 0
-    // Smooth damp factor (gentle transition rate: 4.5)
-    wiggleFactor.current = THREE.MathUtils.damp(wiggleFactor.current, targetWiggle, 4.5, delta)
+    // Ultra-smooth damp factor (luxurious gradual transition rate: 2.5)
+    wiggleFactor.current = THREE.MathUtils.damp(wiggleFactor.current, targetWiggle, 2.5, delta)
     const w = wiggleFactor.current
 
     if (groupRef.current) {
-      // Gentle, subtle organic tilt and sway
-      const rx = Math.sin(t * 7.5 + seed) * 0.12 * w
-      const ry = Math.cos(t * 6.0 + seed) * 0.14 * w
-      const rz = Math.sin(t * 8.0 + seed) * 0.15 * w
+      // Micro-subtle organic tilt and floating sway
+      const rx = Math.sin(t * 3.8 + seed) * 0.05 * w
+      const ry = Math.cos(t * 3.2 + seed) * 0.06 * w
+      const rz = Math.sin(t * 4.2 + seed) * 0.06 * w
 
       groupRef.current.rotation.set(rx, ry, rz)
 
-      const currentScale = scale * (1 + Math.sin(t * 5.0 + seed) * 0.06 * w)
+      const currentScale = scale * (1 + Math.sin(t * 2.8 + seed) * 0.025 * w)
       groupRef.current.scale.set(currentScale, currentScale, currentScale)
     }
   })
