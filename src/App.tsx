@@ -2,7 +2,7 @@ import { Suspense, useEffect, useRef, useState } from 'react'
 import Scene from './Scene'
 import { ScrollEscorts } from './ScrollEscorts'
 import { Timeline } from './Timeline'
-import { ShowModal, type ShowItem } from './ShowModal'
+import { ShowModal, type ShowItem, type OriginRect } from './ShowModal'
 import { REDUCED_MOTION } from './swarmFormations'
 import './App.css'
 
@@ -106,35 +106,40 @@ const QUOTES = [
 ]
 
 const CLIENTS = [
+  'Bahrain NYE',
   'Coca-Cola',
   'McDonald’s',
-  'Cartier',
-  'Porsche',
-  'Deloitte',
-  'Hennessy',
-  'PwC',
-  'Pop Mart',
-  'GrabPay',
-  'Sun Life',
-  'CapitaLand',
-  'Sentosa',
-  'Token2049',
-  'Gardens by the Bay',
+  'F1 GP',
+  'Dubai Fest',
+  'ETEX Expo',
 ]
 
-
 interface PortfolioProps {
-  onSelectShow: (show: ShowItem) => void
+  onSelectShow: (s: ShowItem, rect: OriginRect | null) => void
 }
 
-// show rows with a photo + play-button preview that trails the cursor
 function Portfolio({ onSelectShow }: PortfolioProps) {
   const [active, setActive] = useState<number | null>(null)
-  const preview = useRef<HTMLDivElement>(null)
+  const preview = useRef<HTMLDivElement>(null!)
 
   const onMove = (e: React.MouseEvent) => {
-    const el = preview.current
-    if (el) el.style.transform = `translate(${e.clientX + 28}px, ${e.clientY - 130}px)`
+    if (!preview.current) return
+    const x = e.clientX + 24
+    const y = e.clientY - 110
+    preview.current.style.transform = `translate3d(${x}px, ${y}px, 0)`
+  }
+
+  const handleRowClick = (s: ShowItem, e: React.MouseEvent) => {
+    const cardEl = preview.current?.querySelector('.show-preview-card') as HTMLElement
+    let rect: OriginRect | null = null
+    if (cardEl && cardEl.classList.contains('on')) {
+      const r = cardEl.getBoundingClientRect()
+      rect = { top: r.top, left: r.left, width: r.width, height: r.height }
+    } else {
+      const r = e.currentTarget.getBoundingClientRect()
+      rect = { top: r.top, left: r.left, width: r.width, height: r.height }
+    }
+    onSelectShow(s, rect)
   }
 
   return (
@@ -147,14 +152,14 @@ function Portfolio({ onSelectShow }: PortfolioProps) {
             className="show-row reveal"
             onMouseEnter={() => setActive(i)}
             onMouseLeave={() => setActive(null)}
-            onClick={() => onSelectShow(s)}
+            onClick={(e) => handleRowClick(s, e)}
             role="button"
             tabIndex={0}
             aria-label={`View details for ${s.title}`}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault()
-                onSelectShow(s)
+                handleRowClick(s, e as unknown as React.MouseEvent)
               }
             }}
           >
@@ -182,6 +187,12 @@ function Portfolio({ onSelectShow }: PortfolioProps) {
 
 function App() {
   const [selectedShow, setSelectedShow] = useState<ShowItem | null>(null)
+  const [originRect, setOriginRect] = useState<OriginRect | null>(null)
+
+  const handleSelectShow = (s: ShowItem, rect: OriginRect | null) => {
+    setOriginRect(rect)
+    setSelectedShow(s)
+  }
 
   const handleBookClick = () => {
     const bookEl = document.getElementById('book')
@@ -296,7 +307,7 @@ function App() {
           </div>
         </div>
 
-        <Portfolio onSelectShow={setSelectedShow} />
+        <Portfolio onSelectShow={handleSelectShow} />
 
         <Timeline />
 
@@ -338,7 +349,11 @@ function App() {
 
       <ShowModal
         show={selectedShow}
-        onClose={() => setSelectedShow(null)}
+        originRect={originRect}
+        onClose={() => {
+          setSelectedShow(null)
+          setOriginRect(null)
+        }}
       />
     </>
   )
