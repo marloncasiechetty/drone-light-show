@@ -26,10 +26,9 @@ interface ShowModalProps {
   shows: ShowItem[]
   originRect: OriginRect | null
   onClose: () => void
-  onBookClick?: () => void
 }
 
-export const ShowModal: React.FC<ShowModalProps> = ({ show, shows, originRect, onClose, onBookClick }) => {
+export const ShowModal: React.FC<ShowModalProps> = ({ show, shows, originRect, onClose }) => {
   const [isVisible, setIsVisible] = useState(false)
   const [currentIndex, setCurrentIndex] = useState<number>(0)
   const [isPlaying, setIsPlaying] = useState(true)
@@ -162,28 +161,7 @@ export const ShowModal: React.FC<ShowModalProps> = ({ show, shows, originRect, o
         className={`aww-player-container ${isVisible ? 'open' : ''}`}
         style={styleObj}
       >
-        {/* Top Header Bar matching reference */}
-        <header className="aww-top-header">
-          <div className="aww-header-left">
-            <span className="menu-icon">≡</span>
-            <span>Menu</span>
-          </div>
 
-          <div className="aww-header-logo">
-            mirs innovate
-          </div>
-
-          <button
-            className="aww-header-cta"
-            onClick={() => {
-              onClose()
-              if (onBookClick) onBookClick()
-            }}
-          >
-            <span>Book a show</span>
-            <span className="arrow">→</span>
-          </button>
-        </header>
 
         {/* Center Edge-to-Edge Video Surface */}
         <div className="aww-video-viewport" onClick={togglePlay}>

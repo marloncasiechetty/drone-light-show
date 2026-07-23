@@ -355,7 +355,6 @@ function App() {
           setSelectedShow(null)
           setOriginRect(null)
         }}
-        onBookClick={handleBookClick}
       />
     </>
   )
