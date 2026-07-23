@@ -204,6 +204,17 @@ function App() {
         <div className="hero-frame">
           <header className="hero-top">
             <img className="logo" src="/mirs-logo.png" alt="MIRS Innovate" />
+            
+            <nav className="hero-nav">
+              <a href="#about" className="nav-link">About</a>
+              <a href="#portfolio" className="nav-link">Portfolio</a>
+              <a href="#timeline" className="nav-link">Process</a>
+              <a href="#testimonials" className="nav-link">Testimonials</a>
+            </nav>
+
+            <button className="nav-cta" onClick={handleBookClick}>
+              Book a show
+            </button>
           </header>
 
           {/* the logo is drawn in the sky by the swarm — this is the accessible copy of it */}
