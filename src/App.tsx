@@ -226,7 +226,7 @@ function App() {
 
             <div className="hero-copy-right">
               <p className="hero-lede-text">
-                MIRS Innovate is a worldwide network of visual artists, filmmakers and storytellers bound not by place, status or labels but by passion and hunger to unlock potential through our unique perspectives.
+                The world’s premier drone show company. Launches, festivals and national celebrations, painted in the sky in any country.
               </p>
               <button className="hero-pill-btn" onClick={handleBookClick}>
                 <span>Book a show</span>
