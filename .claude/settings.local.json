@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "WebFetch(domain:www.mirs-innov.com)",
+      "Bash(curl -sL \"https://www.mirs-innov.com/_next/image?url=%2Fimages%2Fmirs-logo%2Flogo-white.png&w=256&q=75\" -o mirs-logo.png)",
+      "Bash(sips -g pixelWidth -g pixelHeight mirs-logo.png)",
+      "Bash(curl -sL \"https://www.mirs-innov.com/drone-light-show\")",
+      "Bash(python3 *)"
+    ]
+  }
+}
