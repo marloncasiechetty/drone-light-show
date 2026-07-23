@@ -24,10 +24,10 @@ function ShowDirector({ positions, colors }: { positions: THREE.Vector3[]; color
     const textPoints = textPointsRef.points
 
     for (let i = 0; i < positions.length; i++) {
-      if (stage === 1 && textPoints) {
-        target.copy(textPoints[i])
-      } else if (stage === 2) {
+      if (stage === 0) {
         starburst(i, positions.length, t, target)
+      } else if (stage === 1 && textPoints) {
+        target.copy(textPoints[i])
       } else {
         constellation(i, positions.length, t, target)
       }
@@ -37,11 +37,11 @@ function ShowDirector({ positions, colors }: { positions: THREE.Vector3[]; color
       p.y = THREE.MathUtils.damp(p.y, target.y, 1.4, delta)
       p.z = THREE.MathUtils.damp(p.z, target.z, 1.4, delta)
 
-      if (stage === 1) {
-        targetColor.copy(LOGO_WHITE)
-      } else if (stage === 2) {
-        // cyan at the base sweeping to violet at the crown
+      if (stage === 0) {
+        // cyan at the base sweeping to violet at the crown for Globe
         targetColor.setHSL(0.52 + ((target.y - 3.6) / 9.2 + 0.5) * 0.26, 0.9, 0.62)
+      } else if (stage === 1) {
+        targetColor.copy(LOGO_WHITE)
       } else {
         targetColor.setHSL(0.5 + ((i * 13) % 7) * 0.008, 0.85, 0.68)
       }
@@ -73,7 +73,7 @@ export function DroneSwarm() {
     () =>
       Array.from({ length: COUNT }, (_, i) => {
         const v = new THREE.Vector3()
-        constellation(i, COUNT, 0, v)
+        starburst(i, COUNT, 0, v)
         return v
       }),
     [],

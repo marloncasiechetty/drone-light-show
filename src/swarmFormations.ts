@@ -4,11 +4,11 @@ const GOLDEN_ANGLE = 2.399963
 
 export const REDUCED_MOTION = typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
-// the looping show program — names are surfaced live in the DOM HUD
+// the looping show program — starting with the 3D rotating Globe
 export const STAGES = [
-  { name: 'CONSTELLATION', duration: 7 },
+  { name: 'GLOBE', duration: 10 },
   { name: 'EMBLEM', duration: 11 },
-  { name: 'STARBURST', duration: 9 },
+  { name: 'CONSTELLATION', duration: 8 },
 ] as const
 
 const TOTAL = STAGES.reduce((sum, s) => sum + s.duration, 0)
