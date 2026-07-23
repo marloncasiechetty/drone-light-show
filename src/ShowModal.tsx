@@ -124,6 +124,18 @@ export const ShowModal: React.FC<ShowModalProps> = ({ show, shows, originRect, o
     }
   }
 
+  const handleShare = () => {
+    if (navigator.share && activeShow) {
+      navigator.share({
+        title: activeShow.title,
+        text: activeShow.description,
+        url: window.location.href,
+      }).catch(() => {})
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(window.location.href)
+    }
+  }
+
   if (!activeShow) return null
 
   // Extension animation from mini preview card rect to 100vw x 100vh
@@ -293,28 +305,43 @@ export const ShowModal: React.FC<ShowModalProps> = ({ show, shows, originRect, o
             ))}
           </div>
 
-          {/* Bottom Right: Mute Sound & Project Info */}
+          {/* Bottom Right: Sound, Share & Project Info */}
           <div className="aww-bottom-right-actions">
             <button className="aww-icon-circle" onClick={toggleMute} aria-label={isMuted ? 'Sound on' : 'Mute'}>
               {isMuted ? (
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="1" y1="1" x2="23" y2="23" />
-                  <path d="M9 9L5 13H1v-2h4l4 4V9z" />
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                  <line x1="23" y1="9" x2="17" y2="15" />
+                  <line x1="17" y1="9" x2="23" y2="15" />
                 </svg>
               ) : (
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
                   <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
                 </svg>
               )}
             </button>
 
+            <button className="aww-icon-circle" onClick={handleShare} aria-label="Share show">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="18" cy="5" r="3" />
+                <circle cx="6" cy="12" r="3" />
+                <circle cx="18" cy="19" r="3" />
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+              </svg>
+            </button>
+
             <button className={`aww-info-pill ${showInfo ? 'active' : ''}`} onClick={() => setShowInfo(!showInfo)}>
               <span>Project info</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="8" y1="6" x2="21" y2="6" />
-                <line x1="8" y1="12" x2="21" y2="12" />
-                <line x1="8" y1="18" x2="21" y2="18" />
+                <line x1="4" y1="6" x2="20" y2="6" />
+                <line x1="4" y1="12" x2="20" y2="12" />
+                <line x1="4" y1="18" x2="20" y2="18" />
+                <circle cx="8" cy="6" r="1.8" fill="currentColor" />
+                <circle cx="16" cy="12" r="1.8" fill="currentColor" />
+                <circle cx="12" cy="18" r="1.8" fill="currentColor" />
               </svg>
             </button>
           </div>
