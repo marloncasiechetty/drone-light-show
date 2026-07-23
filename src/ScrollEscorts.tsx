@@ -47,18 +47,19 @@ function Escort({ seed, side, depth, scale, color }: { seed: number; side: 1 | -
     const isProximityHover = distToCursor < 2.5 || hovered
 
     const targetWiggle = isProximityHover ? 1 : 0
-    wiggleFactor.current = THREE.MathUtils.damp(wiggleFactor.current, targetWiggle, 8, delta)
+    // Smooth damp factor (gentle transition rate: 4.5)
+    wiggleFactor.current = THREE.MathUtils.damp(wiggleFactor.current, targetWiggle, 4.5, delta)
     const w = wiggleFactor.current
 
     if (groupRef.current) {
-      // Energetic 3D rotation wiggle tilt
-      const rx = Math.sin(t * 30 + seed) * 0.35 * w
-      const ry = Math.cos(t * 26 + seed) * 0.4 * w
-      const rz = Math.sin(t * 32 + seed) * 0.45 * w
+      // Gentle, subtle organic tilt and sway
+      const rx = Math.sin(t * 7.5 + seed) * 0.12 * w
+      const ry = Math.cos(t * 6.0 + seed) * 0.14 * w
+      const rz = Math.sin(t * 8.0 + seed) * 0.15 * w
 
       groupRef.current.rotation.set(rx, ry, rz)
 
-      const currentScale = scale * (1 + Math.sin(t * 18 + seed) * 0.18 * w)
+      const currentScale = scale * (1 + Math.sin(t * 5.0 + seed) * 0.06 * w)
       groupRef.current.scale.set(currentScale, currentScale, currentScale)
     }
   })
@@ -75,11 +76,11 @@ function Escort({ seed, side, depth, scale, color }: { seed: number; side: 1 | -
       <Drone
         formationPosition={pos}
         showColor={color}
-        glow={wiggleFactor.current > 0.1 ? 4.5 : 1.6}
+        glow={2.0}
         scale={scale}
-        wander={wiggleFactor.current > 0.1 ? [0.85, 0.65] : [0.45, 0.3]}
-        speed={wiggleFactor.current > 0.1 ? 1.3 : 0.35}
-        spinSpeed={wiggleFactor.current > 0.1 ? 30 : 10}
+        wander={[0.5, 0.35]}
+        speed={0.4}
+        spinSpeed={12}
         phase={seed}
         lit
       />
