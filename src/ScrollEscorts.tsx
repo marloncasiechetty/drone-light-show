@@ -35,33 +35,21 @@ function Escort({ seed, side, depth, scale, color }: { seed: number; side: 1 | -
     // parked above the viewport during the hero; drift up and down as sections pass
     const ty = p > 0.03 ? THREE.MathUtils.clamp(Math.cos(p * Math.PI * 1.7 + seed) * 1.6 - vel.current * 0.0012, -2.6, 2.6) : 10
 
-    pos.x = THREE.MathUtils.damp(pos.x, tx, 1.6, delta)
-    pos.y = THREE.MathUtils.damp(pos.y, ty, 1.6, delta)
-
-    // Calculate cursor proximity in 3D world space (bulletproof 100% reliable hover trigger)
+    // Calculate cursor proximity in 3D world space (bulletproof hover trigger)
     const mouseWorldX = (state.pointer.x * state.viewport.width) / 2
     const mouseWorldY = (state.pointer.y * state.viewport.height) / 2
     const distToCursor = Math.hypot(mouseWorldX - pos.x, mouseWorldY - pos.y)
     
-    // Trigger wiggle if cursor is near drone in world space OR directly hovered
     const isProximityHover = distToCursor < 2.5 || hovered
-
     const targetWiggle = isProximityHover ? 1 : 0
-    // Ultra-smooth damp factor (luxurious gradual transition rate: 2.5)
-    wiggleFactor.current = THREE.MathUtils.damp(wiggleFactor.current, targetWiggle, 2.5, delta)
+    wiggleFactor.current = THREE.MathUtils.damp(wiggleFactor.current, targetWiggle, 3.5, delta)
     const w = wiggleFactor.current
 
-    if (groupRef.current) {
-      // Micro-subtle organic tilt and floating sway
-      const rx = Math.sin(t * 3.8 + seed) * 0.05 * w
-      const ry = Math.cos(t * 3.2 + seed) * 0.06 * w
-      const rz = Math.sin(t * 4.2 + seed) * 0.06 * w
+    // Gentle vertical up and down movement when hovered
+    const hoverBobY = Math.sin(t * 3.5 + seed) * 0.22 * w
 
-      groupRef.current.rotation.set(rx, ry, rz)
-
-      const currentScale = scale * (1 + Math.sin(t * 2.8 + seed) * 0.025 * w)
-      groupRef.current.scale.set(currentScale, currentScale, currentScale)
-    }
+    pos.x = THREE.MathUtils.damp(pos.x, tx, 1.6, delta)
+    pos.y = THREE.MathUtils.damp(pos.y, ty + hoverBobY, 1.6, delta)
   })
 
   return (
