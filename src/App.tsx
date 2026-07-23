@@ -211,10 +211,6 @@ function App() {
               <a href="#timeline" className="nav-link">Process</a>
               <a href="#testimonials" className="nav-link">Testimonials</a>
             </nav>
-
-            <button className="nav-cta" onClick={handleBookClick}>
-              Book a show
-            </button>
           </header>
 
           {/* the logo is drawn in the sky by the swarm — this is the accessible copy of it */}
