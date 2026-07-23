@@ -9,7 +9,7 @@ const scroll = { y: 0, progress: 0 }
 const ACCENT = new THREE.Color('#a5f3fc')
 const CYAN = new THREE.Color('#7de8ff')
 
-function Escort({ seed, side, depth, scale, color }: { seed: number; side: 1 | -1; depth: number; scale: number; color: THREE.Color }) {
+function Escort({ seed, side, depth = 0.2, scale = 0.9, color }: { seed: number; side: 1 | -1; depth?: number; scale?: number; color: THREE.Color }) {
   const pos = useMemo(() => new THREE.Vector3(side * 6, 10, depth), [side, depth])
   const vel = useRef(0)
   const lastY = useRef(0)
@@ -35,18 +35,18 @@ function Escort({ seed, side, depth, scale, color }: { seed: number; side: 1 | -
     // parked above the viewport during the hero; drift up and down as sections pass
     const ty = p > 0.03 ? THREE.MathUtils.clamp(Math.cos(p * Math.PI * 1.7 + seed) * 1.6 - vel.current * 0.0012, -2.6, 2.6) : 10
 
-    // Calculate cursor proximity in 3D world space (bulletproof hover trigger)
+    // Calculate cursor proximity in 3D world space (identical 100% reliable trigger for both left and right)
     const mouseWorldX = (state.pointer.x * state.viewport.width) / 2
     const mouseWorldY = (state.pointer.y * state.viewport.height) / 2
     const distToCursor = Math.hypot(mouseWorldX - pos.x, mouseWorldY - pos.y)
     
-    const isProximityHover = distToCursor < 2.5 || hovered
+    const isProximityHover = distToCursor < 3.0 || hovered
     const targetWiggle = isProximityHover ? 1 : 0
     wiggleFactor.current = THREE.MathUtils.damp(wiggleFactor.current, targetWiggle, 3.5, delta)
     const w = wiggleFactor.current
 
-    // Gentle vertical up and down movement when hovered
-    const hoverBobY = Math.sin(t * 3.5 + seed) * 0.22 * w
+    // Identical gentle vertical up and down bobbing animation on hover for both drones
+    const hoverBobY = Math.sin(t * 3.5 + seed) * 0.25 * w
 
     pos.x = THREE.MathUtils.damp(pos.x, tx, 1.6, delta)
     pos.y = THREE.MathUtils.damp(pos.y, ty + hoverBobY, 1.6, delta)
@@ -95,8 +95,8 @@ export function ScrollEscorts() {
         <directionalLight position={[3, 5, 4]} intensity={0.8} />
         <directionalLight position={[-4, -2, 3]} intensity={0.3} color="#4f6bff" />
         <Suspense fallback={null}>
-          <Escort seed={0} side={1} depth={1.2} scale={1.05} color={ACCENT} />
-          <Escort seed={2.6} side={-1} depth={-0.8} scale={0.72} color={CYAN} />
+          <Escort seed={0} side={1} depth={0.2} scale={0.9} color={ACCENT} />
+          <Escort seed={2.6} side={-1} depth={0.2} scale={0.9} color={CYAN} />
         </Suspense>
       </Canvas>
     </div>
