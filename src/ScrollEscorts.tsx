@@ -18,17 +18,6 @@ function Escort({ seed, side, depth, scale, color }: { seed: number; side: 1 | -
   const wiggleFactor = useRef(0)
   const groupRef = useRef<THREE.Group>(null!)
 
-  useEffect(() => {
-    if (hovered) {
-      document.body.style.cursor = 'pointer'
-    } else {
-      document.body.style.cursor = ''
-    }
-    return () => {
-      document.body.style.cursor = ''
-    }
-  }, [hovered])
-
   useFrame((state, rawDelta) => {
     const delta = Math.min(rawDelta, 0.1)
     const t = state.clock.elapsedTime
@@ -49,8 +38,15 @@ function Escort({ seed, side, depth, scale, color }: { seed: number; side: 1 | -
     pos.x = THREE.MathUtils.damp(pos.x, tx, 1.6, delta)
     pos.y = THREE.MathUtils.damp(pos.y, ty, 1.6, delta)
 
-    // Wiggle animation calculation when hovered
-    const targetWiggle = hovered ? 1 : 0
+    // Calculate cursor proximity in 3D world space (bulletproof 100% reliable hover trigger)
+    const mouseWorldX = (state.pointer.x * state.viewport.width) / 2
+    const mouseWorldY = (state.pointer.y * state.viewport.height) / 2
+    const distToCursor = Math.hypot(mouseWorldX - pos.x, mouseWorldY - pos.y)
+    
+    // Trigger wiggle if cursor is near drone in world space OR directly hovered
+    const isProximityHover = distToCursor < 2.5 || hovered
+
+    const targetWiggle = isProximityHover ? 1 : 0
     wiggleFactor.current = THREE.MathUtils.damp(wiggleFactor.current, targetWiggle, 8, delta)
     const w = wiggleFactor.current
 
@@ -62,7 +58,7 @@ function Escort({ seed, side, depth, scale, color }: { seed: number; side: 1 | -
 
       groupRef.current.rotation.set(rx, ry, rz)
 
-      const currentScale = scale * (1 + Math.sin(t * 18 + seed) * 0.15 * w)
+      const currentScale = scale * (1 + Math.sin(t * 18 + seed) * 0.18 * w)
       groupRef.current.scale.set(currentScale, currentScale, currentScale)
     }
   })
@@ -79,11 +75,11 @@ function Escort({ seed, side, depth, scale, color }: { seed: number; side: 1 | -
       <Drone
         formationPosition={pos}
         showColor={color}
-        glow={hovered ? 4.5 : 1.6}
+        glow={wiggleFactor.current > 0.1 ? 4.5 : 1.6}
         scale={scale}
-        wander={hovered ? [0.8, 0.6] : [0.45, 0.3]}
-        speed={hovered ? 1.2 : 0.35}
-        spinSpeed={hovered ? 28 : 10}
+        wander={wiggleFactor.current > 0.1 ? [0.85, 0.65] : [0.45, 0.3]}
+        speed={wiggleFactor.current > 0.1 ? 1.3 : 0.35}
+        spinSpeed={wiggleFactor.current > 0.1 ? 30 : 10}
         phase={seed}
         lit
       />
