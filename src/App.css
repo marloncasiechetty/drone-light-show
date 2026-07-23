@@ -78,17 +78,28 @@ body {
   color: var(--accent);
 }
 
+/* ---- Global Unified Button Style System (Almarai Font + ALL CAPS) ---- */
+
+button,
+.cta,
+.nav-cta,
+.hero-pill-btn,
+.modal-primary-cta,
+.modal-secondary-cta {
+  font-family: var(--display) !important;
+  text-transform: uppercase !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.16em !important;
+  border-radius: 999px;
+  box-sizing: border-box;
+}
+
 .nav-cta {
   padding: 11px 24px;
-  font-family: var(--display);
-  font-weight: 700;
   font-size: 0.72rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
   color: var(--night);
   background: var(--accent);
   border: none;
-  border-radius: 999px;
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.19, 1, 0.22, 1);
   box-shadow: 0 4px 20px rgba(165, 243, 252, 0.25);
@@ -97,6 +108,7 @@ body {
 .nav-cta:hover {
   transform: translateY(-2px);
   background: #fff;
+  color: var(--night);
   box-shadow: 0 6px 24px rgba(165, 243, 252, 0.45);
 }
 
@@ -1084,14 +1096,20 @@ main {
   flex: 1;
   text-align: center;
   padding: 13px 24px;
+  font-family: var(--display) !important;
+  text-transform: uppercase !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.16em !important;
+  font-size: 0.74rem;
 }
 
 .modal-secondary-cta {
   padding: 13px 20px;
-  font-family: var(--display);
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-family: var(--display) !important;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase !important;
+  font-weight: 700 !important;
   color: var(--mist);
   background: transparent;
   border: 1px solid var(--hairline);
