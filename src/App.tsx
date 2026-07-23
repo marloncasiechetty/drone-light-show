@@ -3,7 +3,7 @@ import Scene from './Scene'
 import { ScrollEscorts } from './ScrollEscorts'
 import { Timeline } from './Timeline'
 import { ShowModal, type ShowItem } from './ShowModal'
-import { REDUCED_MOTION, STAGES, showState } from './swarmFormations'
+import { REDUCED_MOTION } from './swarmFormations'
 import './App.css'
 
 const SHOWS: ShowItem[] = [
@@ -116,20 +116,6 @@ const CLIENTS = [
   'Gardens by the Bay',
 ]
 
-// live readout of what the 3D swarm is actually flying right now
-function NowFlying() {
-  const [stage, setStage] = useState(showState.stage)
-  useEffect(() => {
-    const id = setInterval(() => setStage(showState.stage), 250)
-    return () => clearInterval(id)
-  }, [])
-  return (
-    <p className="now-flying">
-      <span className="now-flying-dot" />
-      Now flying&ensp;{String(stage + 1).padStart(2, '0')} · {STAGES[stage].name}
-    </p>
-  )
-}
 
 interface PortfolioProps {
   onSelectShow: (show: ShowItem) => void
@@ -246,8 +232,6 @@ function App() {
               </button>
             </div>
           </div>
-
-          <NowFlying />
 
           <a className="scroll-cue" href="#about">
             Scroll
