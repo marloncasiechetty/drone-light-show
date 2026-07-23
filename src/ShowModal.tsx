@@ -17,21 +17,20 @@ export interface ShowItem {
 interface ShowModalProps {
   show: ShowItem | null
   onClose: () => void
-  onBookClick: () => void
 }
 
-export const ShowModal: React.FC<ShowModalProps> = ({ show, onClose, onBookClick }) => {
+export const ShowModal: React.FC<ShowModalProps> = ({ show, onClose }) => {
   const [isVisible, setIsVisible] = useState(false)
   const [activeShow, setActiveShow] = useState<ShowItem | null>(null)
   const [isPlaying, setIsPlaying] = useState(true)
-  const [isMuted, setIsMuted] = useState(true)
+  const [isMuted, setIsMuted] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
     if (show) {
       setActiveShow(show)
       setIsPlaying(true)
-      setIsMuted(true)
+      setIsMuted(false)
 
       const frame1 = requestAnimationFrame(() => {
         const frame2 = requestAnimationFrame(() => setIsVisible(true))
@@ -47,7 +46,7 @@ export const ShowModal: React.FC<ShowModalProps> = ({ show, onClose, onBookClick
         setActiveShow(null)
         document.body.style.overflow = ''
         document.documentElement.style.overflow = ''
-      }, 450)
+      }, 400)
       return () => clearTimeout(timer)
     }
   }, [show])
@@ -87,29 +86,27 @@ export const ShowModal: React.FC<ShowModalProps> = ({ show, onClose, onBookClick
 
   return (
     <div
-      className={`modal-backdrop ${isVisible ? 'open' : ''}`}
+      className={`pure-video-backdrop ${isVisible ? 'open' : ''}`}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
       role="dialog"
       aria-modal="true"
-      aria-labelledby="modal-title"
+      aria-labelledby="video-title"
     >
-      <div className="modal-glow-ambient" aria-hidden />
+      <div className="pure-video-glow" aria-hidden />
 
-      <div className={`modal-card modal-video-card ${isVisible ? 'open' : ''}`}>
-        {/* Awwwards Close Button */}
-        <button className="modal-close" onClick={onClose} aria-label="Close video modal">
-          <span className="close-icon-wrapper">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </span>
+      <div className={`pure-video-card ${isVisible ? 'open' : ''}`}>
+        {/* Awwwards Floating Close Button */}
+        <button className="video-modal-close" onClick={onClose} aria-label="Close video">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
         </button>
 
-        {/* Video Player Hero Header */}
-        <div className="modal-video-hero">
+        {/* Pure Video Surface */}
+        <div className="pure-video-viewport" onClick={togglePlay}>
           {activeShow.videoUrl ? (
             <video
               ref={videoRef}
@@ -119,108 +116,64 @@ export const ShowModal: React.FC<ShowModalProps> = ({ show, onClose, onBookClick
               loop
               muted={isMuted}
               playsInline
-              className="modal-video-element"
-              onClick={togglePlay}
+              className="pure-video-player"
             />
           ) : (
-            <img src={activeShow.img} alt={activeShow.title} className="modal-img-zoom" />
+            <img src={activeShow.img} alt={activeShow.title} className="pure-video-fallback" />
           )}
 
-          <div className="modal-img-gradient" />
+          {/* Minimalist Overlay Gradient */}
+          <div className="pure-video-overlay-gradient" />
 
-          {/* Video Player Controls Overlay */}
-          <div className="modal-video-controls">
-            <button className="video-control-btn play-pause-btn" onClick={togglePlay} aria-label={isPlaying ? 'Pause video' : 'Play video'}>
-              {isPlaying ? (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <rect x="6" y="4" width="4" height="16" rx="1" />
-                  <rect x="14" y="4" width="4" height="16" rx="1" />
-                </svg>
-              ) : (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <polygon points="5,3 19,12 5,21" />
-                </svg>
-              )}
-            </button>
-
-            <button className="video-control-btn mute-btn" onClick={toggleMute} aria-label={isMuted ? 'Unmute video' : 'Mute video'}>
-              {isMuted ? (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="1" y1="1" x2="23" y2="23" />
-                  <path d="M9 9L5 13H1v-2h4l4 4V9z" />
-                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-                </svg>
-              ) : (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-                </svg>
-              )}
-            </button>
-          </div>
-
-          <div className="modal-badge-wrapper">
-            <span className="modal-badge">
-              <span className="live-dot" /> VIDEO PREVIEW
-            </span>
-            <span className="modal-drones-badge">✦ {activeShow.drones} DRONES</span>
-          </div>
-        </div>
-
-        {/* Modal content body */}
-        <div className="modal-content">
-          <div className="modal-header">
-            <h2 id="modal-title" className="modal-title">{activeShow.title}</h2>
-            <p className="modal-location">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 21s-8-4.5-8-11.5a8 8 0 1 1 16 0C20 16.5 12 21 12 21z" />
-                <circle cx="12" cy="9.5" r="3" />
-              </svg>
-              <span>{activeShow.location}</span>
-            </p>
-          </div>
-
-          <div className="modal-stats-grid">
-            <div className="modal-stat-item">
-              <span className="stat-label">Fleet Size</span>
-              <span className="stat-val">{activeShow.drones}</span>
+          {/* Minimalist Info & Control Bar */}
+          <div className="pure-video-bottom-bar" onClick={(e) => e.stopPropagation()}>
+            <div className="video-show-info">
+              <span className="video-badge">{activeShow.category}</span>
+              <h3 id="video-title" className="video-show-title">{activeShow.title}</h3>
+              <p className="video-show-meta">
+                📍 {activeShow.location} &ensp;·&ensp; <span className="cyan-text">{activeShow.drones} DRONES</span>
+              </p>
             </div>
-            <div className="modal-stat-item">
-              <span className="stat-label">Duration</span>
-              <span className="stat-val">{activeShow.duration}</span>
+
+            <div className="video-action-buttons">
+              <button className="video-control-pill" onClick={togglePlay}>
+                {isPlaying ? (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <rect x="6" y="4" width="4" height="16" rx="1" />
+                      <rect x="14" y="4" width="4" height="16" rx="1" />
+                    </svg>
+                    <span>Pause</span>
+                  </>
+                ) : (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="5,3 19,12 5,21" />
+                    </svg>
+                    <span>Play</span>
+                  </>
+                )}
+              </button>
+
+              <button className="video-control-pill" onClick={toggleMute}>
+                {isMuted ? (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="1" y1="1" x2="23" y2="23" />
+                      <path d="M9 9L5 13H1v-2h4l4 4V9z" />
+                    </svg>
+                    <span>Sound On</span>
+                  </>
+                ) : (
+                  <>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                    </svg>
+                    <span>Mute</span>
+                  </>
+                )}
+              </button>
             </div>
-            <div className="modal-stat-item">
-              <span className="stat-label">Category</span>
-              <span className="stat-val">{activeShow.category}</span>
-            </div>
-          </div>
-
-          <div className="modal-body-text">
-            <p className="modal-desc">{activeShow.description}</p>
-          </div>
-
-          <div className="modal-highlights-pills">
-            {activeShow.highlights.map((h, i) => (
-              <span key={i} className="highlight-tag">
-                <span className="tag-dot" /> {h}
-              </span>
-            ))}
-          </div>
-
-          <div className="modal-actions">
-            <button
-              className="cta modal-primary-cta"
-              onClick={() => {
-                onClose()
-                onBookClick()
-              }}
-            >
-              Book Similar Show
-            </button>
-            <button className="modal-secondary-cta" onClick={onClose}>
-              Dismiss
-            </button>
           </div>
         </div>
       </div>

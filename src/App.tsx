@@ -339,7 +339,6 @@ function App() {
       <ShowModal
         show={selectedShow}
         onClose={() => setSelectedShow(null)}
-        onBookClick={handleBookClick}
       />
     </>
   )
