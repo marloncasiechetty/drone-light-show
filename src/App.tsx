@@ -349,11 +349,13 @@ function App() {
 
       <ShowModal
         show={selectedShow}
+        shows={SHOWS}
         originRect={originRect}
         onClose={() => {
           setSelectedShow(null)
           setOriginRect(null)
         }}
+        onBookClick={handleBookClick}
       />
     </>
   )

@@ -23,24 +23,29 @@ export interface OriginRect {
 
 interface ShowModalProps {
   show: ShowItem | null
+  shows: ShowItem[]
   originRect: OriginRect | null
   onClose: () => void
+  onBookClick?: () => void
 }
 
-export const ShowModal: React.FC<ShowModalProps> = ({ show, originRect, onClose }) => {
+export const ShowModal: React.FC<ShowModalProps> = ({ show, shows, originRect, onClose, onBookClick }) => {
   const [isVisible, setIsVisible] = useState(false)
-  const [activeShow, setActiveShow] = useState<ShowItem | null>(null)
+  const [currentIndex, setCurrentIndex] = useState<number>(0)
   const [isPlaying, setIsPlaying] = useState(true)
   const [isMuted, setIsMuted] = useState(false)
+  const [showInfo, setShowInfo] = useState(false)
   const [progress, setProgress] = useState(0)
   const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
-    if (show) {
-      setActiveShow(show)
+    if (show && shows.length > 0) {
+      const idx = shows.findIndex((s) => s.id === show.id)
+      setCurrentIndex(idx >= 0 ? idx : 0)
       setIsPlaying(true)
       setIsMuted(false)
       setProgress(0)
+      setShowInfo(false)
 
       const frame1 = requestAnimationFrame(() => {
         const frame2 = requestAnimationFrame(() => setIsVisible(true))
@@ -53,23 +58,44 @@ export const ShowModal: React.FC<ShowModalProps> = ({ show, originRect, onClose 
     } else {
       setIsVisible(false)
       const timer = setTimeout(() => {
-        setActiveShow(null)
+        setCurrentIndex(0)
         document.body.style.overflow = ''
         document.documentElement.style.overflow = ''
       }, 550)
       return () => clearTimeout(timer)
     }
-  }, [show])
+  }, [show, shows])
+
+  const activeShow = shows[currentIndex] || show
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && show) {
-        onClose()
+      if (!show) return
+      if (e.key === 'Escape') onClose()
+      if (e.key === 'ArrowLeft') goToPrev()
+      if (e.key === 'ArrowRight') goToNext()
+      if (e.key === ' ') {
+        e.preventDefault()
+        togglePlay()
       }
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [show, onClose])
+  }, [show, currentIndex, shows])
+
+  const goToPrev = () => {
+    if (shows.length === 0) return
+    setCurrentIndex((prev) => (prev - 1 + shows.length) % shows.length)
+    setIsPlaying(true)
+    setProgress(0)
+  }
+
+  const goToNext = () => {
+    if (shows.length === 0) return
+    setCurrentIndex((prev) => (prev + 1) % shows.length)
+    setIsPlaying(true)
+    setProgress(0)
+  }
 
   const handleTimeUpdate = () => {
     const v = videoRef.current
@@ -124,79 +150,201 @@ export const ShowModal: React.FC<ShowModalProps> = ({ show, originRect, onClose 
 
   return (
     <div
-      className={`fullscreen-video-backdrop ${isVisible ? 'open' : ''}`}
+      className={`aww-player-backdrop ${isVisible ? 'open' : ''}`}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
       role="dialog"
       aria-modal="true"
-      aria-labelledby="video-title"
+      aria-labelledby="aww-video-title"
     >
       <div
-        className={`fullscreen-video-container ${isVisible ? 'open' : ''}`}
+        className={`aww-player-container ${isVisible ? 'open' : ''}`}
         style={styleObj}
       >
-        {/* Minimalist Top Controls */}
-        <div className="minimal-top-bar">
-          <div className="minimal-top-badge">
-            <span className="live-dot" />
-            <span>{activeShow.category}</span>
-            <span className="badge-sep">·</span>
-            <span>{activeShow.drones} DRONES</span>
+        {/* Top Header Bar matching reference */}
+        <header className="aww-top-header">
+          <div className="aww-header-left">
+            <span className="menu-icon">≡</span>
+            <span>Menu</span>
           </div>
 
-          <button className="minimal-close-pill" onClick={onClose} aria-label="Close fullscreen video">
-            <span>CLOSE</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
-        </div>
+          <div className="aww-header-logo">
+            mirs innovate
+          </div>
 
-        {/* Edge-to-Edge Fullscreen HTML5 Video Viewport */}
-        <div className="fullscreen-video-viewport" onClick={togglePlay}>
+          <button
+            className="aww-header-cta"
+            onClick={() => {
+              onClose()
+              if (onBookClick) onBookClick()
+            }}
+          >
+            <span>Book a show</span>
+            <span className="arrow">→</span>
+          </button>
+        </header>
+
+        {/* Center Edge-to-Edge Video Surface */}
+        <div className="aww-video-viewport" onClick={togglePlay}>
           {activeShow.videoUrl ? (
             <video
               ref={videoRef}
+              key={activeShow.id}
               src={activeShow.videoUrl}
               poster={activeShow.img}
               autoPlay
               loop
               muted={isMuted}
               playsInline
-              className="fullscreen-video-element"
+              className="aww-video-element"
               onTimeUpdate={handleTimeUpdate}
             />
           ) : (
-            <img src={activeShow.img} alt={activeShow.title} className="fullscreen-video-fallback" />
+            <img src={activeShow.img} alt={activeShow.title} className="aww-video-fallback" />
           )}
 
-          {/* Minimalist Bottom Vignette Gradient */}
-          <div className="fullscreen-vignette" />
+          {/* Centered Play/Pause Button */}
+          <button
+            className={`aww-center-play-btn ${isPlaying ? 'playing' : ''}`}
+            onClick={(e) => {
+              e.stopPropagation()
+              togglePlay()
+            }}
+            aria-label={isPlaying ? 'Pause video' : 'Play video'}
+          >
+            {isPlaying ? (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="6" y="4" width="4" height="16" rx="1" />
+                <rect x="14" y="4" width="4" height="16" rx="1" />
+              </svg>
+            ) : (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5,3 19,12 5,21" />
+              </svg>
+            )}
+          </button>
 
-          {/* Minimalist HUD Controls Overlay */}
-          <div className="fullscreen-bottom-hud" onClick={(e) => e.stopPropagation()}>
-            <div className="hud-show-meta">
-              <h2 id="video-title" className="hud-title">{activeShow.title}</h2>
-              <p className="hud-subtitle">📍 {activeShow.location} &ensp;·&ensp; {activeShow.duration}</p>
+          {/* Left Arrow Floating Button */}
+          <button
+            className="aww-nav-arrow left"
+            onClick={(e) => {
+              e.stopPropagation()
+              goToPrev()
+            }}
+            aria-label="Previous show"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+          </button>
+
+          {/* Right Arrow Floating Button */}
+          <button
+            className="aww-nav-arrow right"
+            onClick={(e) => {
+              e.stopPropagation()
+              goToNext()
+            }}
+            aria-label="Next show"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 5" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Project Info Side Drawer Panel */}
+        {showInfo && (
+          <div className="aww-info-drawer">
+            <div className="drawer-header">
+              <span className="drawer-badge">{activeShow.category}</span>
+              <h3 id="aww-video-title">{activeShow.title}</h3>
+              <p className="drawer-location">📍 {activeShow.location} &ensp;·&ensp; {activeShow.duration}</p>
             </div>
-
-            <div className="hud-actions">
-              <button className="hud-control-btn" onClick={togglePlay}>
-                {isPlaying ? 'PAUSE' : 'PLAY'}
-              </button>
-
-              <button className="hud-control-btn" onClick={toggleMute}>
-                {isMuted ? 'SOUND ON' : 'MUTE'}
-              </button>
+            <div className="drawer-body">
+              <p>{activeShow.description}</p>
+              <div className="drawer-stats">
+                <div>
+                  <span>Fleet</span>
+                  <strong>{activeShow.drones} DRONES</strong>
+                </div>
+                <div>
+                  <span>Category</span>
+                  <strong>{activeShow.category}</strong>
+                </div>
+              </div>
             </div>
           </div>
+        )}
 
-          {/* Bottom Live Playback Progress Line */}
-          <div className="fullscreen-progress-track">
-            <div className="fullscreen-progress-bar" style={{ width: `${progress}%` }} />
+        {/* Bottom Control HUD & Interactive Filmstrip Carousel */}
+        <footer className="aww-bottom-bar" onClick={(e) => e.stopPropagation()}>
+          {/* Bottom Left: Back to Shows */}
+          <button className="aww-back-pill" onClick={onClose}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+            <span>Back to work</span>
+          </button>
+
+          {/* Bottom Center: Interactive Filmstrip Carousel */}
+          <div className="aww-filmstrip">
+            {shows.map((s, idx) => (
+              <button
+                key={s.id}
+                className={`aww-filmstrip-thumb ${idx === currentIndex ? 'active' : ''}`}
+                onClick={() => {
+                  setCurrentIndex(idx)
+                  setIsPlaying(true)
+                  setProgress(0)
+                }}
+                aria-label={`Switch to ${s.title}`}
+              >
+                <img src={s.img} alt={s.title} />
+                {idx === currentIndex && (
+                  <>
+                    <span className="tick top" />
+                    <span className="tick bottom" />
+                  </>
+                )}
+              </button>
+            ))}
           </div>
+
+          {/* Bottom Right: Mute Sound & Project Info */}
+          <div className="aww-bottom-right-actions">
+            <button className="aww-icon-circle" onClick={toggleMute} aria-label={isMuted ? 'Sound on' : 'Mute'}>
+              {isMuted ? (
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="1" y1="1" x2="23" y2="23" />
+                  <path d="M9 9L5 13H1v-2h4l4 4V9z" />
+                </svg>
+              ) : (
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                </svg>
+              )}
+            </button>
+
+            <button className={`aww-info-pill ${showInfo ? 'active' : ''}`} onClick={() => setShowInfo(!showInfo)}>
+              <span>Project info</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="8" y1="6" x2="21" y2="6" />
+                <line x1="8" y1="12" x2="21" y2="12" />
+                <line x1="8" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
+          </div>
+        </footer>
+
+        {/* Bottom Full-Width Progress Scrubber Line */}
+        <div className="aww-progress-track">
+          <div className="aww-progress-bar" style={{ width: `${progress}%` }} />
         </div>
       </div>
     </div>
