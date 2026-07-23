@@ -222,7 +222,7 @@ function App() {
                 MIRS Innovate is a worldwide network of visual artists, filmmakers and storytellers bound not by place, status or labels but by passion and hunger to unlock potential through our unique perspectives.
               </p>
               <button className="hero-pill-btn" onClick={handleBookClick}>
-                <span>Join the lab</span>
+                <span>Book a show</span>
                 <span className="pill-arrow">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="5" y1="12" x2="19" y2="12" />
